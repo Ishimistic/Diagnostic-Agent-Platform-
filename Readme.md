@@ -103,7 +103,8 @@ backend/
    PORT=4000
    MONGO_URI=your_mongodb_connection_string
    JWT_SECRET=your_secret_key
-   ALLOWED_ORIGIN=http://localhost:3000
+   JWT_EXPIRES_IN=xd
+   ALLOWED_ORIGIN=http://localhost:5173
 
    ```
 4. Start the developement server:

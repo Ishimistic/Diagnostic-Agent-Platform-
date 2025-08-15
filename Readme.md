@@ -6,7 +6,6 @@ It includes:
 - A **React frontend** for authentication, prompt management, data upload, and SQI computation.  
 - An **Express.js backend** with authentication, prompt handling, data upload, and SQI endpoints.  
 
----
 
 ## 🚀 Features  
 
@@ -26,9 +25,10 @@ It includes:
 - **SQI routes** to compute SQI and generate summary payloads.  
 - Middleware for error handling and route protection with JWT.  
 
----
+
 
 ## 📂 Project Structure  
+```bash
 frontend/
   ├── src/
   │   ├── App.js
@@ -69,9 +69,8 @@ backend/
       ├── prompt.js
       ├── data.js
       └── sqi.js
+```
 
-
----
 
 ## 🖥️ Frontend Setup  
 

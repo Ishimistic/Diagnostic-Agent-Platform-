@@ -31,15 +31,6 @@ const Dashboard = ({ user, onLogout }) => {
     loadLatestPrompt();
   }, []);
 
-  const loadLatestPrompt = async () => {
-    try {
-      const data = await api.getLatestPrompt();
-      setPrompt(data.text);
-      setPromptVersion(data.version);
-    } catch (err) {
-      console.log('No existing prompt found');
-    }
-  };
 
   const handleSavePrompt = async () => {
     setLoading(true);
@@ -104,6 +95,16 @@ const Dashboard = ({ user, onLogout }) => {
       showMessage(err.message, 'error');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadLatestPrompt = async () => {
+    try {
+      const data = await api.getLatestPrompt();
+      setPrompt(data.text);
+      setPromptVersion(data.version);
+    } catch (err) {
+      console.log('No existing prompt found');
     }
   };
 

@@ -32,6 +32,7 @@ const ComputeTab = ({
           </div>
 
           <div className="flex gap-4">
+           {/* Computing SQI button*/}
             <button
               onClick={onComputeSQI}
               disabled={loading || !studentId}
@@ -42,6 +43,7 @@ const ComputeTab = ({
             </button>
 
             {sqiResult && (
+              // Download JSON Button
               <button
                 onClick={onDownloadPayload}
                 className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors flex items-center gap-2"
@@ -59,6 +61,7 @@ const ComputeTab = ({
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="mb-4 flex justify-between items-center">
             <h3 className="text-lg font-medium text-gray-900">SQI Results</h3>
+            {/* Copy JSON button */}
             <button
               onClick={() => onCopyToClipboard(JSON.stringify(sqiResult, null, 2))}
               className="text-blue-600 hover:text-blue-800 flex items-center gap-1 text-sm"

@@ -27,32 +27,31 @@ function pickRandomWeighted(weights) {
 export const generateDiagnostic = async (req, res) => {
   try {
     const { text } = req.body; 
-    console.log("Text: ", text);
+    // console.log("Text: ", text);
     if (!text) {
       return res.status(400).json({ message: "Prompt text is required" });
     }
     const totalQuestions = extractTotalQuestions(text) || 5;
     
-    // You can later replace this with AI-based generation or rules from DB
+    // RAG implementaion to be done
     const questions = [];
 
     const difficultySplit = { easy: 0.2, medium: 0.3, hard: 0.5 };
     const importanceSplit = { A: 0.5, B: 0.3, C: 0.2 };
     const types = ["practical", "theory"];
 
-   
-
+    // Example allocation of the generation -> later will be replaced by the RAG working
     for (let i = 0; i < totalQuestions; i++) {
       questions.push({
         topic: `Topic-${i + 1}`,
         concept: `Concept-${i + 1}`,
         importance: pickRandomWeighted(importanceSplit), 
         difficulty: pickRandomWeighted(difficultySplit),
-        type: types[i % 2], // alternate practical/theory
-        caseFlag: Math.random() < 0.05, // 5% case questions
+        type: types[i % 2],
+        caseFlag: Math.random() < 0.05, 
         marks: 2,
         negMarks: -0.5,
-        expectedTime: getExpectedTime(i), // from your "per-question time sheet"
+        expectedTime: getExpectedTime(i),
       });
     }
 

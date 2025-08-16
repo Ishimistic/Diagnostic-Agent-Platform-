@@ -76,7 +76,7 @@ export function computeSQI(data) {
   const ranked_concepts_for_summary = concept_scores
     .map((c) => {
       const imp = importanceW[c.importance] ?? 0.7;
-      const inv_read_time = 0.7; // neutral fallback
+      const inv_read_time = 0.7;
       const diag_quality = 1 - c.sqi / 100;
       const wrong_flag = c.wrongOnce ? 1 : 0;
 

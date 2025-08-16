@@ -58,7 +58,6 @@ backend/
   ├── middleware/
   │   ├── Auth.js
   │   └── Error.js
-  |   |__ Validate.js
   ├── routes/
   │   ├── Auth.js
   │   ├── Admin.js

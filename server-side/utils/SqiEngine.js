@@ -5,10 +5,8 @@ const typeW = { Practical: 1.1, Theory: 1.0 };
 const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
 
 export function computeAttemptScore(a) {
-  // per-question base
   let base = a.correct ? (a.marks ?? 1) : -(a.neg_marks ?? 0);
 
-  // weights
   let weighted =
     base *
     (importanceW[a.importance] ?? 0.7) *
@@ -57,11 +55,13 @@ export function computeSQI(data) {
 
     c.sumWeighted += weighted;
     c.sumMax += Math.max(0, maxPossible);
+
     if (!a.correct) c.wrongOnce = 1;
+
     conceptAgg.set(key, c);
   }
 
-  const raw_pct = clamp((sumWeighted / (sumMax || 1)) * 100, 0, 100);
+  const tempSqi = clamp((sumWeighted / (sumMax || 1)) * 100, 0, 100);
 
   // per-concept normalized 0..100
   const concept_scores = [...conceptAgg.values()].map((c) => ({
@@ -72,19 +72,12 @@ export function computeSQI(data) {
     wrongOnce: c.wrongOnce
   }));
 
-  // ranked concepts for summary (weighting recipe from spec)
+  // Ranked concepts for summary
   const ranked_concepts_for_summary = concept_scores
     .map((c) => {
-      // 25% importance weight (A=1, B=0.7, C=0.5)
       const imp = importanceW[c.importance] ?? 0.7;
-
-      // 20% inverse reading-time proxy (we don't have set1, so use revisit* proxy as 0)
       const inv_read_time = 0.7; // neutral fallback
-
-      // 15% diagnostic quality (1 - (concept_sqi/100))
       const diag_quality = 1 - c.sqi / 100;
-
-      // 40% wrong-at-least-once (binary)
       const wrong_flag = c.wrongOnce ? 1 : 0;
 
       const weight = 0.40 * wrong_flag + 0.25 * imp + 0.20 * inv_read_time + 0.15 * diag_quality;
@@ -102,18 +95,13 @@ export function computeSQI(data) {
       };
     })
     .sort((a, b) => b.weight - a.weight)
-    .slice(10); // can trim or keep all; adjust as needed
+    .slice(10);
 
   return {
     student_id: data.student_id,
-    overall_sqi: Number(raw_pct.toFixed(2)),
+    overall_sqi: Number(tempSqi.toFixed(2)),
     concept_scores,
-    ranked_concepts_for_summary,
-    metadata: {
-      diagnostic_prompt_version: 'v1',
-      computed_at: new Date().toISOString(),
-      engine: 'sqi-v0.1'
-    }
+    ranked_concepts_for_summary
   };
 }
 

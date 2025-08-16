@@ -9,7 +9,7 @@ import authRoutes from './routes/Auth.js';
 import adminRoutes from './routes/Admin.js';
 import dataRoutes from './routes/Data.js';
 import sqiRoutes from './routes/sqi.js';
-import { notFound, errorHandler } from './middleware/error.js';
+import { notFound, errorHandler } from './middleware/Error.js';
 
 dotenv.config();
 const app = express();

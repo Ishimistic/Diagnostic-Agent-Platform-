@@ -34,12 +34,16 @@ frontend/
   │   ├── App.js
   │   ├── services/api.js
   │   ├── utils/auth.js
-  │   ├── pages/Dashboard.js
+  │   ├── pages
+  │   │   ├── Login.js
+  │   │   ├── Dashboard.js
   │   ├── components/
-  │   │   ├── auth/Login.js
   │   │   ├── dashboard/Header.js
   │   │   ├── dashboard/MessageAlert.js
   │   │   ├── tabs/PromptTab.js
+  │   │   ├── tabs/PromptAction.js
+  │   │   ├── tabs/PromptEditor.js
+  │   │   ├── tabs/DiagnosticPreview.js
   │   │   ├── tabs/UploadTab.js
   │   │   └── tabs/ComputeTab.js
 

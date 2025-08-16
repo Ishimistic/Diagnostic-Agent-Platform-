@@ -12,7 +12,7 @@ export const uploadJSON = async (req, res) => {
 
     const doc = await Attempt.findOneAndUpdate(
       { student_id },
-      { $addToSet: { attempts: { $each: attempts } } }, // Merge without duplicates
+      { $addToSet: { attempts: { $each: attempts } } }, 
       { upsert: true, new: true }
     );
 

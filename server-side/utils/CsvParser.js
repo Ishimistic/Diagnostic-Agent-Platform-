@@ -10,7 +10,6 @@ export const csvToAttempts = async (csvText, student_id = 'S000') =>
     parse(csvText, { columns: true, trim: true })
       .on('readable', function () {
         let record;
-        // eslint-disable-next-line no-cond-assign
         while ((record = this.read())) records.push(record);
       })
       .on('end', () => {

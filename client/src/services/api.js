@@ -7,7 +7,6 @@ const api = {
 
   async request(endpoint, options = {}) {
     const token = getToken();
-    console.log("Token -> upload: ", token);
 
     const isFormData = options.body instanceof FormData;
     const config = {

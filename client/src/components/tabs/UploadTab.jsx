@@ -23,7 +23,7 @@ const UploadTab = ({
             value={studentId}
             onChange={(e) => setStudentId(e.target.value)}
             className="w-40 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="S001"
+            placeholder="S000"
           />
         </div>
       </div>

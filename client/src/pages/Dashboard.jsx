@@ -6,18 +6,16 @@ import PromptTab from '../components/tabs/PromptTab';
 import UploadTab from '../components/tabs/UploadTab';
 import ComputeTab from '../components/tabs/ComputeTab';
 import api from '../services/api';
-// import { useMessage } from '../hooks/useMessage';
 
 const Dashboard = ({ user, onLogout }) => {
   const [activeTab, setActiveTab] = useState('prompt');
   const [prompt, setPrompt] = useState('');
   const [promptVersion, setPromptVersion] = useState('v1');
-  const [studentId, setStudentId] = useState('S001');
+  const [studentId, setStudentId] = useState('S000');
   const [jsonData, setJsonData] = useState('');
   const [csvFile, setCsvFile] = useState(null);
   const [sqiResult, setSqiResult] = useState(null);
   const [loading, setLoading] = useState(false);
-  // const { message, messageType, showMessage } = useMessage();
 
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');

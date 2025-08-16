@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Login from './components/auth/Login';
+import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import { isLoggedIn, removeToken } from './utils/auth';
 

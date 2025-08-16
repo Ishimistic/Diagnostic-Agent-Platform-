@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { User, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
-import api from '../../services/api';
-import { setToken } from '../../utils/auth';
+import api from '../services/api';
+import { setToken } from '../utils/auth';
 
 const Login = ({ onLogin }) => {
   const [email, setEmail] = useState('');

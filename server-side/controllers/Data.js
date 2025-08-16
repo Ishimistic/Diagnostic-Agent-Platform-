@@ -2,7 +2,7 @@ import fs from "fs";
 import Attempt from "../models/Attempts.js";
 import { csvToAttempts } from "../utils/CsvParser.js";
 
-// JSON upload - merges attempts without duplicates
+// JSON upload 
 export const uploadJSON = async (req, res) => {
   try {
     const { student_id, attempts } = req.body || {};
@@ -23,7 +23,7 @@ export const uploadJSON = async (req, res) => {
   }
 };
 
-// CSV upload - merges attempts without duplicates
+// CSV upload 
 export const uploadCSV = async (req, res) => {
   try {
     if (!req.file) {
@@ -43,6 +43,7 @@ export const uploadCSV = async (req, res) => {
 
     fs.unlinkSync(req.file.path);
     res.status(201).json(doc);
+    
   } catch (err) {
     console.error("Error in uploadCSV:", err);
     res.status(500).json({ message: "Internal server error" });

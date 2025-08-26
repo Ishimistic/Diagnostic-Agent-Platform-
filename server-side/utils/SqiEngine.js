@@ -5,7 +5,7 @@ const typeW = { Practical: 1.1, Theory: 1.0 };
 const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
 
 export function computeAttemptScore(a) {
-  let base = a.correct ? (a.marks ?? 1) : -(a.neg_marks ?? 0);
+  let base = a.correct ? a.marks ?? 1 : -(a.neg_marks ?? 0);
 
   let weighted =
     base *
@@ -37,31 +37,45 @@ export function computeSQI(data) {
   let sumMax = 0;
 
   const conceptAgg = new Map();
+  const topicAgg = new Map();
 
   for (const a of data.attempts || []) {
     const { weighted, maxPossible } = computeAttemptScore(a);
     sumWeighted += weighted;
-    sumMax += Math.max(0, maxPossible); // prevent negatives in denom
+    sumMax += Math.max(0, maxPossible);
 
-    const key = byKey(a);
-    const c = conceptAgg.get(key) || {
+    const cKey = `${a.topic}|||${a.concept}`;
+    const c = conceptAgg.get(cKey) || {
       topic: a.topic,
       concept: a.concept,
       sumWeighted: 0,
       sumMax: 0,
       wrongOnce: 0,
-      importance: a.importance
+      importance: a.importance,
     };
 
     c.sumWeighted += weighted;
     c.sumMax += Math.max(0, maxPossible);
 
     if (!a.correct) c.wrongOnce = 1;
+    conceptAgg.set(cKey, c);
 
-    conceptAgg.set(key, c);
+    const t = topicAgg.get(a.topic) || {
+      topic: a.topic,
+      sumWeighted: 0,
+      sumMax: 0,
+    };
+    t.sumWeighted += weighted;
+    t.sumMax += Math.max(0, maxPossible);
+    topicAgg.set(a.topic, t);
   }
 
-  const tempSqi = clamp((sumWeighted / (sumMax || 1)) * 100, 0, 100);
+  const overallSqi = clamp((sumWeighted / (sumMax || 1)) * 100, 0, 100);
+
+  const topic_scores = [...topicAgg.values()].map((t) => ({
+    topic: t.topic,
+    sqi: clamp((t.sumWeighted / (t.sumMax || 1)) * 100, 0, 100),
+  }));
 
   // per-concept normalized 0..100
   const concept_scores = [...conceptAgg.values()].map((c) => ({
@@ -69,7 +83,7 @@ export function computeSQI(data) {
     concept: c.concept,
     sqi: clamp((c.sumWeighted / (c.sumMax || 1)) * 100, 0, 100),
     importance: c.importance,
-    wrongOnce: c.wrongOnce
+    wrongOnce: c.wrongOnce,
   }));
 
   // Ranked concepts for summary
@@ -80,18 +94,23 @@ export function computeSQI(data) {
       const diag_quality = 1 - c.sqi / 100;
       const wrong_flag = c.wrongOnce ? 1 : 0;
 
-      const weight = 0.40 * wrong_flag + 0.25 * imp + 0.20 * inv_read_time + 0.15 * diag_quality;
+      const weight =
+        0.4 * wrong_flag +
+        0.25 * imp +
+        0.2 * inv_read_time +
+        0.15 * diag_quality;
 
       const reasons = [];
-      if (wrong_flag) reasons.push('Wrong earlier');
-      if ((importanceW[c.importance] ?? 0.7) >= 1) reasons.push('High importance (A)');
-      if (c.sqi < 60) reasons.push('Low diagnostic score');
+      if (wrong_flag) reasons.push("Wrong earlier");
+      if ((importanceW[c.importance] ?? 0.7) >= 1)
+        reasons.push("High importance (A)");
+      if (c.sqi < 60) reasons.push("Low diagnostic score");
 
       return {
         topic: c.topic,
         concept: c.concept,
         weight: Number(weight.toFixed(2)),
-        reasons
+        reasons,
       };
     })
     .sort((a, b) => b.weight - a.weight)
@@ -99,9 +118,15 @@ export function computeSQI(data) {
 
   return {
     student_id: data.student_id,
-    overall_sqi: Number(tempSqi.toFixed(2)),
+    overall_sqi: Number(overallSqi.toFixed(2)),
+    topic_scores, // ← ADD THIS
     concept_scores,
-    ranked_concepts_for_summary
+    ranked_concepts_for_summary,
+    metadata: {
+      diagnostic_prompt_version: "v1",
+      computed_at: new Date().toISOString(),
+      engine: "sqi-v0.1",
+    },
   };
 }
 
@@ -109,12 +134,48 @@ export function toSummaryAgentPayload(result) {
   return {
     student_id: result.student_id,
     overall_sqi: result.overall_sqi,
+    topic_scores: result.topic_scores.map((t) => ({
+      topic: t.topic,
+      sqi: Number(t.sqi.toFixed(1)),
+    })),
     concept_scores: result.concept_scores.map((c) => ({
+      topic: c.topic,
+      concept: c.concept,
+      sqi: Number(c.sqi.toFixed(1)),
+    })),
+    ranked_concepts_for_summary: result.ranked_concepts_for_summary,
+    metadata: result.metadata,
+  };
+}
+
+export function formatSummaryAgentPayload(result) {
+  return {
+    student_id: result.student_id,
+    overall_sqi: Number(result.overall_sqi.toFixed(1)),
+
+    topic_scores: (result.topic_scores || []).map(t => ({
+      topic: t.topic,
+      sqi: Number(t.sqi.toFixed(1))
+    })),
+
+    concept_scores: (result.concept_scores || []).map(c => ({
       topic: c.topic,
       concept: c.concept,
       sqi: Number(c.sqi.toFixed(1))
     })),
-    ranked_concepts_for_summary: result.ranked_concepts_for_summary,
-    metadata: result.metadata
+
+    ranked_concepts_for_summary: (result.ranked_concepts_for_summary || []).map(r => ({
+      topic: r.topic,
+      concept: r.concept,
+      weight: Number(r.weight.toFixed(2)),
+      reasons: r.reasons || []
+    })),
+
+    // metadata
+    metadata: {
+      diagnostic_prompt_version: "v1",
+      computed_at: new Date().toISOString(),
+      engine: "sqi-v0.1"
+    }
   };
 }
